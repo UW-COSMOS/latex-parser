@@ -15,24 +15,26 @@ def unparse(node):
     if node.tag == 'mrow':
         return '{'+''.join(unparse(n) for n in node)+'}'
 
+    
+
     return node.text
 
 def get_variables(latex):
-    processed = latex.replace(' ', '')
+    processed = latex.replace(' ', '[space]')
     processed = processed.replace('\\', '[backslash]')
     processed = processed.replace('(', '{')
     processed = processed.replace(')', '}')
     # print(processed)
     response = muterun_js('katex/parse.js', processed)
     # print(response.stdout)
-    print(response.stderr)
+    # print(response.stderr)
     if response.stdout == b'-1\n' or not response.stdout:
         yield -1
         return
 
     tree = etree.fromstring(response.stdout)
     ast = tree.xpath('.//semantics')[0]
-    # print(etree.tostring(ast))
+    # print(etree.tostring(ast, pretty_print=True))
     count = 0
 
     for c in ast.xpath('.//*'):
@@ -44,13 +46,14 @@ def get_variables(latex):
     for row in ast.xpath('.//mrow'):
         ngram.append([])
         for mi in row:
-    
-            if mi.text and mi.tag == 'mi':
+            if mi.text and mi.tag == 'mi' and mi.text:
                 ngram_kv[mi.attrib['id']] = row.attrib['id']
+                if mi.text in ['=', '+', '-', '*', '/']:
+                    ngram.append([])
+                    continue
                 ngram[-1].append(mi.text)
             else:
-                if len(ngram[-1]) > 0:
-                    ngram.append([])
+                ngram.append([])
 
     for sup in tree.xpath('.//msup'):
         if 'None' not in unparse(sup):
@@ -64,7 +67,7 @@ def get_variables(latex):
         if id.attrib['id'] not in ngram_kv:
             if 'None' not in unparse(id):
                 yield id.text
-
+    
     for _x in ngram:
         if len(_x) > 0:
             yield ''.join(_x)
