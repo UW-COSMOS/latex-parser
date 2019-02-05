@@ -75,32 +75,8 @@ def get_variables(latex):
 
 if __name__ == '__main__':
 
-    # import json
-    # latex = json.load(open('latex.json', 'r'))[0]
-
-    # variable_union = set()
-
-    # for l in latex:
-    #     variables = get_variables(l)
-    #     # print(l, list(variables))
-    #     if variables == -1:
-    #         continue
-    #     for v in variables:
-    #         if isinstance(v, etree._Element):
-    #             variable_union.add(
-    #                 unparse(v)
-    #             )
-    #         else:
-    #             variable_union.add(
-    #                 v
-    #             )
-
-    # print(variable_union)
-
     for g in get_variables('{{Q}}=c^{2}{P}^{a}{e^{[backslash]gamma}{O}+{2}{P}^{a}}^{-l}e^{2}{Q}'):
         print(g)
 
-    # for i in list(variable_union):
-    #     unparse(i)
 
 
