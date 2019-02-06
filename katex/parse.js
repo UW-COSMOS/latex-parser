@@ -10,5 +10,3 @@ catch (e) {
     console.log('-1')
     throw e
 }
-    
-

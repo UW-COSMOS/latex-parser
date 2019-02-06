@@ -1,5 +1,9 @@
 from Naked.toolshed.shell import muterun_js
 from lxml import etree
+import click
+import os
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def unparse(node):
 
@@ -15,8 +19,6 @@ def unparse(node):
     if node.tag == 'mrow':
         return '{'+''.join(unparse(n) for n in node)+'}'
 
-    
-
     return node.text
 
 def get_variables(latex):
@@ -24,9 +26,8 @@ def get_variables(latex):
     processed = processed.replace('\\', '[backslash]')
     processed = processed.replace('(', '{')
     processed = processed.replace(')', '}')
-    # print(processed)
-    response = muterun_js('katex/parse.js', processed)
-    # print(response.stdout)
+
+    response = muterun_js(os.path.join(CURRENT_DIR, 'katex/parse.js'), processed)
     # print(response.stderr)
     if response.stdout == b'-1\n' or not response.stdout:
         yield -1
@@ -72,11 +73,16 @@ def get_variables(latex):
         if len(_x) > 0:
             yield ''.join(_x)
 
+@click.command()
+@click.option('--latex', required=True, help='Source latex code to be parsed')
+def get_variables_cli(latex):
+    '''Variable extractor that finds variables in the Latex code'''
+    for g in get_variables(latex):
+        click.echo(unparse(g))
+
 
 if __name__ == '__main__':
-
-    for g in get_variables('{{Q}}=c^{2}{P}^{a}{e^{[backslash]gamma}{O}+{2}{P}^{a}}^{-l}e^{2}{Q}'):
-        print(g)
+    get_variables_cli()
 
 
 
