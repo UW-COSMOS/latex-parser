@@ -9,7 +9,7 @@
 ```bash
 python [path-to-this-repo]/variable_extractor.py --latex {a}_{b}
 ```
-
+_Due to the limitation of the command line tool, please put an extra '\' to every existing '\'_
 ### Usage Description
 
 ```
